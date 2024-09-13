@@ -1,13 +1,13 @@
-class Question {
+class QuestionModel {
   final int id;
   final String question;
   final bool isMandatory;
   final bool singleChoice;
-  final Map<String, List<Question>?>? answerChoices;
+  final Map<String, List<QuestionModel>?>? answerChoices;
   final List<String>? dropdownOptions;
-  final Map<String, List<Question>?>? dropdownFollowUps; // Follow-up questions based on dropdown selection
+  final Map<String, List<QuestionModel>?>? dropdownFollowUps; // Follow-up questions based on dropdown selection
 
-  Question({
+  QuestionModel({
     required this.id,
     required this.question,
     this.isMandatory = false,
