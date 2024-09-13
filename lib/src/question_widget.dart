@@ -1,6 +1,9 @@
 import 'package:dynamic_question/src/question_model.dart';
 import 'package:flutter/material.dart';
 
+import 'package:dynamic_question/src/question_model.dart';
+import 'package:flutter/material.dart';
+
 class QuestionForm extends StatefulWidget {
   final List<QuestionModel> questions;
   final Color? buttonColor;
@@ -17,6 +20,7 @@ class QuestionForm extends StatefulWidget {
   final Color? checkBoxColor;
   final TextStyle? textFieldStyle;
   final InputDecoration? textFieldDecoration;
+  final void Function(List<Map<String, dynamic>>)? onSubmit; // Callback for form submission
 
   QuestionForm({
     required this.questions,
@@ -34,6 +38,7 @@ class QuestionForm extends StatefulWidget {
     this.checkBoxColor,
     this.textFieldStyle,
     this.textFieldDecoration,
+    this.onSubmit, // Initialize the callback
   });
 
   @override
@@ -58,9 +63,14 @@ class _QuestionFormState extends State<QuestionForm> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Printing the answers in the log
-      for (var answer in _answers) {
-        print('Question ID: ${answer["id"]}, Answer: ${answer["answer"]}');
+      // Call the onSubmit callback with the answers
+      if (widget.onSubmit != null) {
+        widget.onSubmit!(_answers);
+      } else {
+        // Handle the case where no callback is provided
+        for (var answer in _answers) {
+          print('Question ID: ${answer["id"]}, Answer: ${answer["answer"]}');
+        }
       }
     } else {
       // Handle form validation errors
@@ -120,6 +130,7 @@ class _QuestionFormState extends State<QuestionForm> {
     );
   }
 }
+
 
 class QuestionWidget extends StatefulWidget {
   final QuestionModel question;

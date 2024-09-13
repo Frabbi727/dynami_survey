@@ -45,7 +45,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-   body: QuestionForm(questions: sampleQuestions,),
+   body: QuestionForm(
+     questions: sampleQuestions,
+     onSubmit: (answers) {
+       // Perform actions with the answers, such as calling an API or navigating to another page
+       print('Form submitted with answers: $answers');
+       // Example: Call an API
+       // apiClient.submitAnswers(answers);
+       // Example: Navigate to another page
+       // Navigator.push(context, MaterialPageRoute(builder: (context) => NextPage()));
+     },
+   )
     );
   }
 
