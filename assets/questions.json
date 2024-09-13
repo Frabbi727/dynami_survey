@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "question": "Do you like Flutter?",
+    "type": "yes_no"
+  },
+  {
+    "id": 2,
+    "question": "What is your favorite programming language?",
+    "type": "multiple_choice",
+    "options": ["Dart", "Python", "JavaScript", "Java"]
+  },
+  {
+    "id": 3,
+    "question": "Please describe your first app.",
+    "type": "text"
+  },
+  {
+    "id": 4,
+    "question": "Do you enjoy coding?",
+    "type": "yes_no"
+  },
+  {
+    "id": 5,
+    "question": "What is your favorite color?",
+    "type": "multiple_choice",
+    "options": ["Red", "Blue", "Green", "Yellow"]
+  },
+  {
+    "id": 6,
+    "question": "What is your preferred IDE?",
+    "type": "text"
+  }
+]
