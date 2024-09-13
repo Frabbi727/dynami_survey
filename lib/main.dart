@@ -1,8 +1,7 @@
-
-import 'package:dynamic_question/survey/new_survey.dart';
 import 'package:flutter/material.dart';
 
 import 'survey/model.dart';
+import 'survey/new_survey.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +21,6 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       themeMode: ThemeMode.system,
-
       home: const MyHomePage(title: 'Flutter Survey'),
     );
   }
@@ -53,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: _sampleQuestions.length,
           itemBuilder: (context, index) {
             return QuestionWidget(
-
               question: _sampleQuestions[index],
               onAnswerSelected: (answer) {
                 setState(() {
@@ -118,7 +115,76 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Question> _sampleQuestions = [
-    // Single-choice question with follow-up
+    // Dropdown question with follow-ups
+    Question(
+      id: 11,
+      isMandatory: true,
+      question: 'What is your preferred beverage?',
+      dropdownOptions: ['Coffee', 'Tea', 'Juice', 'Water'],
+      dropdownFollowUps: {
+        'Coffee': [
+          Question(
+            id: 12,
+            question: 'What type of coffee do you prefer?',
+            dropdownOptions: ['Espresso', 'Latte', 'Cappuccino'],
+          ),
+          Question(
+            id: 14,
+            question: 'How often do you drink coffee?',
+            singleChoice: false, // Multiple-choice
+            answerChoices: {
+              'Daily': null,
+              'Weekly': null,
+              'Occasionally': null,
+              'Never': null,
+            },
+          ),
+        ],
+        'Tea': [
+          Question(
+            id: 13,
+            question: 'Which type of tea do you prefer?',
+            dropdownOptions: ['Black', 'Green', 'Herbal'],
+          ),
+          Question(
+            id: 15,
+            question: 'How do you take your tea?',
+            singleChoice: false, // Multiple-choice
+            answerChoices: {
+              'With Milk': null,
+              'Without Milk': null,
+              'With Sugar': null,
+              'No Sugar': null,
+            },
+          ),
+        ],
+        'Juice': [
+          Question(
+            id: 16,
+            question: 'What flavors of juice do you like?',
+            singleChoice: false, // Multiple-choice
+            answerChoices: {
+              'Orange': null,
+              'Apple': null,
+              'Grape': null,
+              'Pineapple': null,
+            },
+          ),
+        ],
+        'Water': [
+          Question(
+            id: 17,
+            question: 'Do you prefer bottled or tap water?',
+            singleChoice: true,
+            answerChoices: {
+              'Bottled': null,
+              'Tap': null,
+            },
+          ),
+        ],
+      },
+    ),
+    // Single-choice question with follow-ups
     Question(
       id: 1,
       question: 'Do you like coffee?',
@@ -183,18 +249,15 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       },
     ),
-
     // Text input question
     Question(
       id: 8,
       question: "Please describe your ideal beverage",
       isMandatory: true,
     ),
-
     // Multiple-choice question (no follow-ups)
     Question(
       id: 9,
-
       question: "Which fruits do you like?",
       singleChoice: false, // Multiple-choice
       isMandatory: true,
@@ -205,7 +268,6 @@ class _MyHomePageState extends State<MyHomePage> {
         "Orange": null,
       },
     ),
-
     // Single-choice question (no follow-ups)
     Question(
       id: 10,
@@ -219,4 +281,5 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     ),
   ];
+
 }

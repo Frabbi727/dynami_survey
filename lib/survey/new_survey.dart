@@ -38,14 +38,18 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   Map<String, bool> multiChoiceAnswers = {};
   final _formKey = GlobalKey<FormState>();
   final TextEditingController textController = TextEditingController();
+  String? selectedDropdownValue;
+  List<Question>? dropdownFollowUps;
 
   @override
   void initState() {
     super.initState();
     if (!widget.question.singleChoice && widget.question.answerChoices != null) {
-      widget.question.answerChoices!.keys.forEach((choice) {
-        multiChoiceAnswers[choice] = false;
-      });
+      multiChoiceAnswers = Map.fromIterable(
+        widget.question.answerChoices!.keys,
+        key: (key) => key as String,
+        value: (value) => false,
+      );
     }
   }
 
@@ -66,13 +70,16 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           ),
           _buildAnswerInput(widget.question),
           if (followUpQuestions != null) ..._buildFollowUpQuestions(),
+          if (dropdownFollowUps != null) ..._buildDropdownFollowUps(),
         ],
       ),
     );
   }
 
   Widget _buildAnswerInput(Question question) {
-    if (question.answerChoices != null && question.answerChoices!.isNotEmpty) {
+    if (question.dropdownOptions != null && question.dropdownOptions!.isNotEmpty) {
+      return _buildDropdown(question);
+    } else if (question.answerChoices != null && question.answerChoices!.isNotEmpty) {
       return question.singleChoice
           ? Column(children: _buildSingleChoiceAnswers(question))
           : Column(children: _buildMultipleChoiceAnswers(question));
@@ -80,6 +87,37 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       return _buildTextInput(); // Text input for open-ended questions
     }
   }
+
+  Widget _buildDropdown(Question question) {
+    return DropdownButtonFormField<String>(
+      value: selectedDropdownValue,
+      decoration: InputDecoration(
+        labelText: question.question,
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: widget.inputBorderColor ?? Colors.grey),
+        ),
+      ),
+      items: question.dropdownOptions?.map((option) {
+        return DropdownMenuItem<String>(
+          value: option,
+          child: Text(option),
+        );
+      }).toSet().toList(), // Ensure unique items
+      onChanged: (value) {
+        setState(() {
+          selectedDropdownValue = value;
+          dropdownFollowUps = question.dropdownFollowUps?[value];
+        });
+        widget.onAnswerSelected({
+          "id": question.id,
+          "question": question.question,
+          "answer": selectedDropdownValue,
+        });
+      },
+    );
+  }
+
+
 
   List<Widget> _buildSingleChoiceAnswers(Question question) {
     return question.answerChoices?.keys.map((answer) {
@@ -92,7 +130,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             selectedAnswer = value;
             followUpQuestions = question.answerChoices?[value];
           });
-          // Track answer with question ID
           widget.onAnswerSelected({
             "id": question.id,
             "question": question.question,
@@ -100,16 +137,24 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           });
         },
         activeColor: widget.radioButtonColor ?? Colors.blue,
-
       );
     }).toList() ?? [];
   }
 
   List<Widget> _buildMultipleChoiceAnswers(Question question) {
+    // Initialize multiChoiceAnswers only if it's empty or null
+    if (multiChoiceAnswers.isEmpty) {
+      multiChoiceAnswers = Map.fromIterable(
+        question.answerChoices!.keys,
+        key: (key) => key as String,
+        value: (value) => false,
+      );
+    }
+
     return question.answerChoices?.keys.map((answer) {
       return CheckboxListTile(
         title: Text(answer),
-        value: multiChoiceAnswers[answer],
+        value: multiChoiceAnswers[answer] ?? false, // Ensure non-null value
         onChanged: (bool? value) {
           setState(() {
             multiChoiceAnswers[answer] = value ?? false;
@@ -124,6 +169,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       );
     }).toList() ?? [];
   }
+
 
   Widget _buildTextInput() {
     String? input;
@@ -140,7 +186,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
         onChanged: (value) {
           if (value.isNotEmpty) {
-            input=value;
+            input = value;
             widget.onAnswerSelected({
               "id": widget.question.id,
               "question": widget.question.question,
@@ -160,6 +206,22 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
   List<Widget> _buildFollowUpQuestions() {
     return followUpQuestions?.map((q) => QuestionWidget(
+      question: q,
+      onAnswerSelected: widget.onAnswerSelected,
+      textColor: widget.textColor,
+      padding: widget.padding,
+      margin: widget.margin,
+      fontSize: widget.fontSize,
+      inputBorderColor: widget.inputBorderColor,
+      radioButtonColor: widget.radioButtonColor,
+      checkBoxColor: widget.checkBoxColor,
+      textFieldStyle: widget.textFieldStyle,
+      textFieldDecoration: widget.textFieldDecoration,
+    )).toList() ?? [];
+  }
+
+  List<Widget> _buildDropdownFollowUps() {
+    return dropdownFollowUps?.map((q) => QuestionWidget(
       question: q,
       onAnswerSelected: widget.onAnswerSelected,
       textColor: widget.textColor,
