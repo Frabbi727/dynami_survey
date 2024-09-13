@@ -1,7 +1,7 @@
+import 'package:dynamic_question/src/question_widget.dart';
 import 'package:flutter/material.dart';
 
-import 'survey/model.dart';
-import 'survey/new_survey.dart';
+import '../src/model.dart';
 
 void main() {
   runApp(const MyApp());

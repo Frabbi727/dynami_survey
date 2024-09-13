@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'model.dart';
+
 
 class QuestionWidget extends StatefulWidget {
   final Question question;
@@ -169,7 +171,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       );
     }).toList() ?? [];
   }
-
 
   Widget _buildTextInput() {
     String? input;
