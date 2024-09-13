@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
    body: QuestionForm(
+
      questions: sampleQuestions,
      onSubmit: (answers) {
        // Perform actions with the answers, such as calling an API or navigating to another page
@@ -65,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Dropdown question with follow-ups
     QuestionModel(
       id: 11,
-      isMandatory: true,
+      isMandatory: false,
       question: 'What is your preferred beverage?',
       dropdownOptions: ['Coffee', 'Tea', 'Juice', 'Water'],
       dropdownFollowUps: {

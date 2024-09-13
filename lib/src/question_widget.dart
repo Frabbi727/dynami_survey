@@ -1,8 +1,6 @@
 import 'package:dynamic_question/src/question_model.dart';
 import 'package:flutter/material.dart';
 
-import 'package:dynamic_question/src/question_model.dart';
-import 'package:flutter/material.dart';
 
 class QuestionForm extends StatefulWidget {
   final List<QuestionModel> questions;
@@ -170,6 +168,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   final TextEditingController textController = TextEditingController();
   String? selectedDropdownValue;
   List<QuestionModel>? dropdownFollowUps;
+  bool hasValidationError = false;
 
   @override
   void initState() {
@@ -191,14 +190,45 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.question.question,
-            style: TextStyle(
-              fontSize: widget.fontSize ?? 16,
-              color: widget.textColor ?? Colors.black,
-            ),
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  widget.question.question,
+                  style: TextStyle(
+                    fontSize: widget.fontSize ?? 16,
+                    color: widget.textColor ?? Colors.black,
+                  ),
+                ),
+              ),
+              if (widget.question.isMandatory)
+                Text(
+                  '*',
+                  style: TextStyle(color: Colors.red, fontSize: widget.fontSize ?? 16),
+                ),
+            ],
           ),
+          if (widget.question.description != null && widget.question.description!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                widget.question.description!,
+                style: TextStyle(
+                  fontSize: (widget.fontSize ?? 16) * 0.8,
+                  color: widget.textColor?.withOpacity(0.7) ?? Colors.black.withOpacity(0.7),
+                ),
+              ),
+            ),
+          SizedBox(height: 8.0),
           _buildAnswerInput(widget.question),
+          if (hasValidationError)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'This field is required',
+                style: TextStyle(color: Colors.red, fontSize: (widget.fontSize ?? 16) * 0.8),
+              ),
+            ),
           if (followUpQuestions != null && followUpQuestions!.isNotEmpty) ..._buildFollowUpQuestions(),
           if (dropdownFollowUps != null && dropdownFollowUps!.isNotEmpty) ..._buildDropdownFollowUps(),
         ],
@@ -237,12 +267,19 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         setState(() {
           selectedDropdownValue = value;
           dropdownFollowUps = question.dropdownFollowUps?[value];
+          hasValidationError = false;
         });
         widget.onAnswerSelected({
           "id": question.id,
           "question": question.question,
           "answer": selectedDropdownValue,
         });
+      },
+      validator: (value) {
+        if (widget.question.isMandatory && (value == null || value.isEmpty)) {
+          return 'This field is required';
+        }
+        return null;
       },
     );
   }
@@ -257,6 +294,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           setState(() {
             selectedAnswer = value;
             followUpQuestions = question.answerChoices?[value];
+            hasValidationError = false;
           });
           widget.onAnswerSelected({
             "id": question.id,
@@ -283,6 +321,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 followUpQuestions?.addAll(question.answerChoices?[key] ?? []);
               }
             });
+            hasValidationError = false;
           });
           widget.onAnswerSelected({
             "id": question.id,
@@ -306,13 +345,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       onChanged: (value) {
-        if (value.isNotEmpty) {
-          widget.onAnswerSelected({
-            "id": widget.question.id,
-            "question": widget.question.question,
-            "answer": value,
-          });
-        }
+        setState(() {
+          hasValidationError = value.isEmpty && widget.question.isMandatory;
+        });
+        widget.onAnswerSelected({
+          "id": widget.question.id,
+          "question": widget.question.question,
+          "answer": value,
+        });
       },
       validator: (value) {
         if (widget.question.isMandatory && (value == null || value.isEmpty)) {
@@ -365,3 +405,5 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     super.dispose();
   }
 }
+
+
