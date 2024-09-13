@@ -184,6 +184,49 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       },
     ),
+
+    // Multiple-choice with follow-up
+    Question(
+      id: 18,
+      question: 'What are your favorite sports?',
+      singleChoice: false, // Multiple-choice
+      isMandatory: true,
+      answerChoices: {
+        'Football': null,
+        'Basketball': [
+          Question(
+            id: 19,
+            question: 'Which basketball team do you support?',
+            isMandatory: true,
+            singleChoice: true,
+            answerChoices: {
+              'Lakers': null,
+              'Warriors': null,
+              'Bulls': null,
+            },
+          ),
+        ],
+        'Tennis': null,
+        'Swimming': null,
+      },
+    ),
+
+    // First dropdown question
+    Question(
+      id: 20,
+      question: 'Which continent are you from?',
+      isMandatory: true,
+      dropdownOptions: ['Asia', 'Africa', 'Europe', 'America'],
+    ),
+
+    // Second dropdown question
+    Question(
+      id: 21,
+      question: 'Which programming language do you prefer?',
+      isMandatory: true,
+      dropdownOptions: ['Dart', 'Python', 'JavaScript', 'C++'],
+    ),
+
     // Single-choice question with follow-ups
     Question(
       id: 1,
@@ -249,12 +292,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       },
     ),
+
     // Text input question
     Question(
       id: 8,
       question: "Please describe your ideal beverage",
       isMandatory: true,
     ),
+
     // Multiple-choice question (no follow-ups)
     Question(
       id: 9,
@@ -268,6 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
         "Orange": null,
       },
     ),
+
     // Single-choice question (no follow-ups)
     Question(
       id: 10,
@@ -281,5 +327,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     ),
   ];
+
 
 }

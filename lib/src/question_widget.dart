@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'model.dart';
-
 
 class QuestionWidget extends StatefulWidget {
   final Question question;
@@ -46,6 +44,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   @override
   void initState() {
     super.initState();
+    // Initialize multiChoiceAnswers if the question has multiple choice answers
     if (!widget.question.singleChoice && widget.question.answerChoices != null) {
       multiChoiceAnswers = Map.fromIterable(
         widget.question.answerChoices!.keys,
@@ -71,8 +70,10 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             ),
           ),
           _buildAnswerInput(widget.question),
-          if (followUpQuestions != null) ..._buildFollowUpQuestions(),
-          if (dropdownFollowUps != null) ..._buildDropdownFollowUps(),
+          if (followUpQuestions != null && followUpQuestions!.isNotEmpty)
+            ..._buildFollowUpQuestions(),
+          if (dropdownFollowUps != null && dropdownFollowUps!.isNotEmpty)
+            ..._buildDropdownFollowUps(),
         ],
       ),
     );
@@ -104,7 +105,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           value: option,
           child: Text(option),
         );
-      }).toSet().toList(), // Ensure unique items
+      }).toList(),
       onChanged: (value) {
         setState(() {
           selectedDropdownValue = value;
@@ -118,8 +119,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       },
     );
   }
-
-
 
   List<Widget> _buildSingleChoiceAnswers(Question question) {
     return question.answerChoices?.keys.map((answer) {
@@ -144,22 +143,21 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   }
 
   List<Widget> _buildMultipleChoiceAnswers(Question question) {
-    // Initialize multiChoiceAnswers only if it's empty or null
-    if (multiChoiceAnswers.isEmpty) {
-      multiChoiceAnswers = Map.fromIterable(
-        question.answerChoices!.keys,
-        key: (key) => key as String,
-        value: (value) => false,
-      );
-    }
-
     return question.answerChoices?.keys.map((answer) {
       return CheckboxListTile(
         title: Text(answer),
-        value: multiChoiceAnswers[answer] ?? false, // Ensure non-null value
+        value: multiChoiceAnswers[answer] ?? false,
         onChanged: (bool? value) {
           setState(() {
             multiChoiceAnswers[answer] = value ?? false;
+
+            // Aggregate follow-up questions from all selected answers
+            followUpQuestions = [];
+            multiChoiceAnswers.forEach((key, isSelected) {
+              if (isSelected) {
+                followUpQuestions?.addAll(question.answerChoices?[key] ?? []);
+              }
+            });
           });
           widget.onAnswerSelected({
             "id": question.id,
@@ -173,7 +171,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   }
 
   Widget _buildTextInput() {
-    String? input;
     return Form(
       key: _formKey,
       child: TextFormField(
@@ -187,11 +184,10 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
         onChanged: (value) {
           if (value.isNotEmpty) {
-            input = value;
             widget.onAnswerSelected({
               "id": widget.question.id,
               "question": widget.question.question,
-              "answer": input,
+              "answer": value,
             });
           }
         },
@@ -206,35 +202,39 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   }
 
   List<Widget> _buildFollowUpQuestions() {
-    return followUpQuestions?.map((q) => QuestionWidget(
-      question: q,
-      onAnswerSelected: widget.onAnswerSelected,
-      textColor: widget.textColor,
-      padding: widget.padding,
-      margin: widget.margin,
-      fontSize: widget.fontSize,
-      inputBorderColor: widget.inputBorderColor,
-      radioButtonColor: widget.radioButtonColor,
-      checkBoxColor: widget.checkBoxColor,
-      textFieldStyle: widget.textFieldStyle,
-      textFieldDecoration: widget.textFieldDecoration,
-    )).toList() ?? [];
+    return followUpQuestions?.map((q) {
+      return QuestionWidget(
+        question: q,
+        onAnswerSelected: widget.onAnswerSelected,
+        textColor: widget.textColor,
+        padding: widget.padding,
+        margin: widget.margin,
+        fontSize: widget.fontSize,
+        inputBorderColor: widget.inputBorderColor,
+        radioButtonColor: widget.radioButtonColor,
+        checkBoxColor: widget.checkBoxColor,
+        textFieldStyle: widget.textFieldStyle,
+        textFieldDecoration: widget.textFieldDecoration,
+      );
+    }).toList() ?? [];
   }
 
   List<Widget> _buildDropdownFollowUps() {
-    return dropdownFollowUps?.map((q) => QuestionWidget(
-      question: q,
-      onAnswerSelected: widget.onAnswerSelected,
-      textColor: widget.textColor,
-      padding: widget.padding,
-      margin: widget.margin,
-      fontSize: widget.fontSize,
-      inputBorderColor: widget.inputBorderColor,
-      radioButtonColor: widget.radioButtonColor,
-      checkBoxColor: widget.checkBoxColor,
-      textFieldStyle: widget.textFieldStyle,
-      textFieldDecoration: widget.textFieldDecoration,
-    )).toList() ?? [];
+    return dropdownFollowUps?.map((q) {
+      return QuestionWidget(
+        question: q,
+        onAnswerSelected: widget.onAnswerSelected,
+        textColor: widget.textColor,
+        padding: widget.padding,
+        margin: widget.margin,
+        fontSize: widget.fontSize,
+        inputBorderColor: widget.inputBorderColor,
+        radioButtonColor: widget.radioButtonColor,
+        checkBoxColor: widget.checkBoxColor,
+        textFieldStyle: widget.textFieldStyle,
+        textFieldDecoration: widget.textFieldDecoration,
+      );
+    }).toList() ?? [];
   }
 
   @override
